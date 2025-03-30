@@ -1,0 +1,1 @@
+export const base_url="https://medium.dhiru952006.workers.dev";
