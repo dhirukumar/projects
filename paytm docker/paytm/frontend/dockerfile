@@ -1,0 +1,41 @@
+# so as you see for backend and frontend we need two diff dockerfile after that we need a head level file docker-compose.yml to add this two diff dockerfile into a singel network
+
+# but if you want to run both frontend without making top level file(.yml) then you need to follow this command 
+# 1.)first make a network because both frontend and backend need to communicate with each other so both lie in a single network
+# docker network create networkname
+# 2.) then run the backend container
+# docker run -d --name backend --network networkname -p 3000:3000 backend(docker image name)
+# 3.) then run the frontend container
+# docker run -d --name frontend --network networkname -p 5173:5173 frontend
+
+# if you wnat to check the logs of the container then you can use this command
+# docker logs -f containername
+
+# Use an official Node.js runtime as the base image
+FROM node:18-alpine
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json because layring is important for caching
+COPY package*.json ./
+
+# Install frontend dependencies
+RUN npm install
+
+# Copy the rest of the frontend code
+COPY . .
+
+# Expose the frontend port
+EXPOSE 5173
+
+# Start the frontend application
+CMD ["npm", "run", "dev"]
+
+
+#  To build the Docker image, run the following command in the terminal from the directory containing this Dockerfile:
+# docker build -t (image name :tage name(like which version or if you not give tage name then latest will be used)) .
+
+
+
+

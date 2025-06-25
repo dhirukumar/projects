@@ -1,0 +1,69 @@
+version: '3.8'
+services:
+   back: #your parent file name then it understand that ok so run docker file in this folde name backend
+    build: 
+    
+     context: ./backend # When building the image, look inside the ./backend folder for the Dockerfile and other necessary files.
+
+    image: dhirukumar/paytm-backend:v3
+    container_name: paytm-back
+    ports:
+      - "3000:3000"
+    # networks:
+    #   - dhiru
+    depends_on:
+      - db
+    environment:
+    # local environment variable which is used in the backend code to connect to the mongo db
+      MONGO_URL: "" 
+      #  MONGO_URL: "if you put your mongo atlus url here or give url when you run backend container then it will connect to that mongo db"
+      # MONGO_URL="mongodb://db:27017/paytm" docker
+      # mongodb://db:27017/paytm
+   db: 
+    image: mongo:latest
+    container_name: paytm-mongo
+    ports:
+      - "27017:27017"
+    # networks:
+    #   - dhiru
+    volumes:
+      - mongo_data:/data/db
+      # MongoDB supports transactions (i.e., .startSession(), .startTransaction(), .commitTransaction()) only on:
+    # Replica sets (even a single-node replica set works)
+    # Or a mongos (for sharded clusters)
+
+     # But not on a plain standalone MongoDB server like you're running in Docker (mongo:latest).
+      # This converts your single MongoDB instance into a replica set, which allows transactions.
+      #  Convert MongoDB Docker container to a Replica Set
+    command: ["--replSet", "rs0"]   # Add this line to enable replica set
+   front: #your parent file name then it understand that ok so run docker file in this folde name backend
+    build: ./frontend
+    container_name: paytm-front #this is name of this container or if you not give name then it will take automatically <project-name>-<service-name>-<instance-number> like name
+
+    image: dhirukumar/paytm-frontend:v1
+    ports:
+      - "5173:5173"
+
+      # networks is already created by docker compose file means if you put service name then it will automatically create a network with the name of project and all this services which present in the compose file will be connected to that same network
+
+    # networks:
+    #   - dhiru
+
+# compose file automatically creates a network with the name of the project and all this services which present in the compose file will be connected to that same network
+# networks:
+#   dhiru:
+#     driver: bridge
+
+volumes:
+  mongo_data:
+    driver: local #You can remove it, and the behavior will remain the same. because the default driver for volumes is already set to local. This line is just explicitly stating that the volume should use the local driver.
+
+# port 3000(your local port):3000(container port)
+# docker push (reposit name:tage name(like which version or if you not give tage name then latest will be used))
+
+# run the docker compose file whithout giving the MONGO_URL because it will give when i run the compose file
+# MONGO_URL="mongodb_url" docker-compose up --build
+
+# docker-compose up --pull always --build
+# docker push dhirukumar/paytm-backend:v1
+# docker push dhirukumar/paytm-frontend:v1
